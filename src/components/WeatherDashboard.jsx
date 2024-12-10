@@ -1,17 +1,14 @@
 import { useState, useEffect } from "react";
-import { getWeather } from "../services/weatherService";
+import { getWeather } from "../services/weatherService.js";
 import rainimge from "../imgs/rain.jpg";
 import blackcloud from "../imgs/blackcloud.jpg";
+import CurrentDateTime from "./CurrentDateTime.jsx";
 
 const WeatherDashboard = () => {
-  const [city, setCity] = useState("");
-  const [weatherData, setWeatherData] = useState(null);
+  const [city, setCity] = useState("cairo");
+  const [weatherData, setWeatherData] = useState();
   // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState("");
-
-  //   if (!weatherData) {
-  //     return <p>Loading...</p>; // Or show a placeholder message
-  //   }
 
   // List of predefined cities
   const predefinedCities = [
@@ -74,6 +71,8 @@ const WeatherDashboard = () => {
       const data = await getWeather(city);
       setWeatherData(data);
 
+      console.log(data);
+
       // Save fetched data to localStorage
       saveToLocalStorage(data);
 
@@ -110,7 +109,7 @@ const WeatherDashboard = () => {
       const fetchData = async () => {
         try {
           setError("");
-          const data = await getWeather("Cairo"); // Use "Cairo" directly here
+          const data = await getWeather("Cairo");
           setWeatherData(data);
 
           // Save fetched data to localStorage
@@ -128,61 +127,115 @@ const WeatherDashboard = () => {
     }
   }, []);
 
-  return (
-    // container
-    <div
-      className="grid grid-cols-3  "
-      style={{ backgroundImage: `url(${blackcloud})` }}
-    >
-      {/* img */}
-      <div
-        className="col-span-2 w-full h-screen relative  bg-cover bg-center"
-        style={{ backgroundImage: `url(${rainimge})` }}
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-[#28413E] opacity-50"></div>
-      </div>
+  console.log(weatherData);
 
-      {/* content */}
-      <div className="bg-[#28413E] opacity-85">
-        <div className="">
-          <h1 className="">Weather Dashboard</h1>
-          <div className="">
-            <input
-              type="text"
-              placeholder="Another Location"
-              value={city || ""}
-              onChange={(e) => setCity(e.target.value)}
-              className=""
-            />
-            <button onClick={handleSearch} className="">
-              Search
-            </button>
+  if (weatherData) {
+    return (
+      // container
+
+      <div
+        className="grid grid-cols-3  "
+        style={{ backgroundImage: `url(${blackcloud})` }}
+      >
+        {/* img */}
+        <div
+          className="col-span-2 w-full h-screen relative  bg-cover bg-center py-10 px-20  text-[#E0E3E3]"
+          style={{ backgroundImage: `url(${rainimge})` }}
+        >
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-[#28413E] opacity-45"></div>
+
+          {/* content */}
+          <div className="relative z-20 flex flex-col justify-between h-full pb-10">
+            <h2 className="font-bold">the.weather</h2>
+            <div className="flex">
+              <p className="text-9xl font-semibold">{weatherData.main.temp}°</p>
+              <div className="font-medium self-end pl-4">
+                <p className=" text-5xl ">{weatherData.name}</p>
+                <CurrentDateTime/>
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* content */}
+        <div className="bg-[#28413E] opacity-80 pl-10">
           <div className="">
-            {predefinedCities.map((predefinedCity) => (
+            {/* Search part  */}
+            <div className=" grid grid-cols-8 gap-8 h-20">
+              <input
+                type="text"
+                placeholder="Another Location"
+                value={city || ""}
+                onChange={(e) => setCity(e.target.value)}
+                className="col-span-6 h-10 place-self-end w-full focus:outline-none bg-transparent border-b border-[#9EA7A6] "
+              />
               <button
-                key={predefinedCity}
-                onClick={() => handlePredefinedCityClick(predefinedCity)}
-                className=""
+                onClick={handleSearch}
+                className="bg-[#718583] col-span-2"
               >
-                {predefinedCity}
+                <i className="fas fa-search text-[#090F0E] text-xl"></i>
               </button>
-            ))}
-          </div>
-          <div className="">
-            <h2 className="">{weatherData.name}</h2>
-            <p>Temperature: {weatherData.main.temp}°C</p>
-            <p>Humidity: {weatherData.main.humidity}%</p>
-            <p>Wind Speed: {weatherData.wind.speed} m/s</p>
-            <p>Description: {weatherData.weather[0].description}</p>
+            </div>
+
+            {/* cities */}
+            <div className=" pt-10 pb-3  mr-10  border-b border-[#9EA7A6] ">
+              {predefinedCities.map((predefinedCity) => (
+                <button
+                  key={predefinedCity}
+                  onClick={() => handlePredefinedCityClick(predefinedCity)}
+                  className=" block text-[#979fa1] pb-7 font-semibold text-md"
+                >
+                  {predefinedCity}
+                </button>
+              ))}
+            </div>
+
+            {/* Weather details */}
+            <div className="pt-10 mr-10  border-b border-[#9EA7A6]  ">
+              <h2 className="text-[#E0E3E3] font-medium text-lg pb-8">
+                Weather Details
+              </h2>
+              <p className="text-[#979fa1] pb-7  text-md flex justify-between font-medium">
+                Cloudy:
+                <span className="text-[#E0E3E3]">
+                  {weatherData.clouds.all}%
+                </span>
+              </p>
+              <p className="text-[#979fa1] pb-7  text-md flex justify-between font-medium">
+                Humidity:
+                <span className="text-[#E0E3E3]">
+                  {weatherData.main.humidity}%
+                </span>
+              </p>
+              <p className="text-[#979fa1] pb-7  text-md flex justify-between font-medium">
+                Wind:
+                <span className="text-[#E0E3E3]">
+                  {weatherData.wind.speed} m/s
+                </span>
+              </p>
+              <p className="text-[#979fa1] pb-7  text-md flex justify-between font-medium">
+                Description:
+                <span className="text-[#E0E3E3]">
+                  {weatherData.weather[0].description}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 };
 
 export default WeatherDashboard;
 
 // bg-gradient-to-r   from-[#090F0E] from-10%  via-[#28413E] via-30% to-[#E0E3E3] to-90%
+// bg-[#4F6764]
+
+{
+  /* <h2 className="">{weatherData.name}</h2> */
+}
+{
+  /* <p>Temperature: {weatherData.main.temp}°C</p> */
+}
