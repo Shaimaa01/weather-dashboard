@@ -5,8 +5,9 @@ import blackcloud from "../imgs/blackcloud.jpg";
 import CurrentDateTime from "./CurrentDateTime.jsx";
 
 const WeatherDashboard = () => {
-  const [city, setCity] = useState("cairo");
+  const [city, setCity] = useState("");
   const [weatherData, setWeatherData] = useState();
+
   // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState("");
 
@@ -22,13 +23,19 @@ const WeatherDashboard = () => {
   //   to handle predfined citys
   const handlePredefinedCityClick = async (selectedCity) => {
     setCity(selectedCity);
+
     try {
       setError("");
+
       const data = await getWeather(selectedCity);
+
       setWeatherData(data);
+
       saveToLocalStorage(data);
-      // Clear the input field
-      setCity("");
+
+      setTimeout(() => {
+        setCity("");
+      }, 2000);
 
       // eslint-disable-next-line no-unused-vars
     } catch (error) {
@@ -39,44 +46,39 @@ const WeatherDashboard = () => {
   // Fetch weather data on load if available in localStorage
   useEffect(() => {
     const storedWeather = getFromLocalStorage();
+
     if (storedWeather) {
-      setCity(storedWeather.city);
       setWeatherData(storedWeather.data);
     }
   }, []);
 
   // Set the interval to fetch the weather data every 30 minutes
   useEffect(() => {
-    if (!city) return; // Don't set the interval if the city is not set
-
     const interval = setInterval(async () => {
       try {
-        const data = await getWeather(city); // Fetch updated weather data
+        const data = await getWeather(getFromLocalStorage()?.data?.name);
         console.log("Updated weather data:", data);
-        setWeatherData(data); // Update the state with new data
-        saveToLocalStorage(city, data); // Save updated data to localStorage
+        setWeatherData(data);
+        saveToLocalStorage(data);
       } catch (error) {
         console.error("Failed to update weather data:", error);
       }
-    }, 30 * 60 * 1000); // 30 minutes interval
+    }, 30 * 60 * 1000);
 
-    // Clear the interval when the component is unmounted or city changes
     return () => clearInterval(interval);
-  }, [city]); // Only set the interval when city changes
+  });
 
   // Handle search and fetch new weather data
   const handleSearch = async () => {
     try {
       setError("");
+
       const data = await getWeather(city);
+
       setWeatherData(data);
 
-      console.log(data);
-
-      // Save fetched data to localStorage
       saveToLocalStorage(data);
 
-      // Clear the input field
       setCity("");
 
       // eslint-disable-next-line no-unused-vars
@@ -109,11 +111,14 @@ const WeatherDashboard = () => {
       const fetchData = async () => {
         try {
           setError("");
+
           const data = await getWeather("Cairo");
+
           setWeatherData(data);
 
-          // Save fetched data to localStorage
           saveToLocalStorage(data);
+
+          setCity("");
 
           // eslint-disable-next-line no-unused-vars
         } catch (error) {
@@ -123,13 +128,13 @@ const WeatherDashboard = () => {
 
       fetchData(); // Call the fetch function
     } else {
-      console.log("not empty");
+      console.log(" Local Storage not empty");
     }
   }, []);
 
-  console.log(weatherData);
-
   if (weatherData) {
+    console.log(weatherData)
+    console.log(weatherData?.weather[0]?.icon)
     return (
       // container
 
@@ -149,10 +154,22 @@ const WeatherDashboard = () => {
           <div className="relative z-20 flex flex-col justify-between h-full pb-10">
             <h2 className="font-bold">the.weather</h2>
             <div className="flex">
-              <p className="text-9xl font-semibold">{weatherData.main.temp}°</p>
+              <p className="text-8xl font-medium">{weatherData.main.temp}°</p>
               <div className="font-medium self-end pl-4">
-                <p className=" text-5xl ">{weatherData.name}</p>
-                <CurrentDateTime/>
+                <p className=" text-4xl ">{weatherData.name}</p>
+                <CurrentDateTime />
+              </div>
+
+              {/* icon */}
+              <div className=" w-20 h-20 rounded-full self-end ">
+                <img
+                  src={`https://openweathermap.org/img/wn/${weatherData?.weather[0]?.icon}@2x.png`}
+                  alt="Current Weather Icon"
+                  className=" w-full h-full bg-cover"
+                />
+                
+                
+
               </div>
             </div>
           </div>
@@ -168,7 +185,7 @@ const WeatherDashboard = () => {
                 placeholder="Another Location"
                 value={city || ""}
                 onChange={(e) => setCity(e.target.value)}
-                className="col-span-6 h-10 place-self-end w-full focus:outline-none bg-transparent border-b border-[#9EA7A6] "
+                className=" search-input col-span-6 h-10 place-self-end w-full focus:outline-none bg-transparent border-b border-[#9EA7A6] text-[#E0E3E3] font-medium  "
               />
               <button
                 onClick={handleSearch}
@@ -229,13 +246,3 @@ const WeatherDashboard = () => {
 };
 
 export default WeatherDashboard;
-
-// bg-gradient-to-r   from-[#090F0E] from-10%  via-[#28413E] via-30% to-[#E0E3E3] to-90%
-// bg-[#4F6764]
-
-{
-  /* <h2 className="">{weatherData.name}</h2> */
-}
-{
-  /* <p>Temperature: {weatherData.main.temp}°C</p> */
-}
