@@ -133,50 +133,45 @@ const WeatherDashboard = () => {
   }, []);
 
   if (weatherData) {
-    console.log(weatherData)
-    console.log(weatherData?.weather[0]?.icon)
     return (
       // container
 
       <div
-        className="grid grid-cols-3  "
+        className="grid grid-cols-3 max-md:block  "
         style={{ backgroundImage: `url(${blackcloud})` }}
       >
         {/* img */}
         <div
-          className="col-span-2 w-full h-screen relative  bg-cover bg-center py-10 px-20  text-[#E0E3E3]"
+          className="col-span-2 w-full h-screen relative  bg-cover bg-center py-10 lg:px-20 md:px-4 max-md:px-4 text-[#E0E3E3]"
           style={{ backgroundImage: `url(${rainimge})` }}
         >
           {/* Overlay */}
           <div className="absolute inset-0 bg-[#28413E] opacity-45"></div>
 
           {/* content */}
-          <div className="relative z-20 flex flex-col justify-between h-full pb-10">
+          <div className="relative z-20 flex flex-col justify-between max-md:justify-normal h-full pb-10">
             <h2 className="font-bold">the.weather</h2>
-            <div className="flex">
-              <p className="text-8xl font-medium">{weatherData.main.temp}°</p>
-              <div className="font-medium self-end pl-4">
-                <p className=" text-4xl ">{weatherData.name}</p>
+            <div className="flex max-md:flex-col  max-md:self-center max-md:mt-16">
+              <p className="lg:text-7xl font-medium md:text-6xl  self-end max-md:self-center max-md:text-5xl">{weatherData.main.temp}°</p>
+              <div className="font-medium self-end pl-4 max-md:self-center max-md:pl-0 max-md:text-center max-md:my-5">
+                <p className=" lg:text-4xl md:text-3xl max-md:text-2xl">{weatherData.name}</p>
                 <CurrentDateTime />
               </div>
 
               {/* icon */}
-              <div className=" w-20 h-20 rounded-full self-end ">
+              <div className=" w-20 h-20 rounded-full self-end max-md:self-center ">
                 <img
                   src={`https://openweathermap.org/img/wn/${weatherData?.weather[0]?.icon}@2x.png`}
                   alt="Current Weather Icon"
                   className=" w-full h-full bg-cover"
                 />
-                
-                
-
               </div>
             </div>
           </div>
         </div>
 
         {/* content */}
-        <div className="bg-[#28413E] opacity-80 pl-10">
+        <div className="bg-[#28413E] opacity-80 lg:pl-10 md:pl-5 max-md:pl-10">
           <div className="">
             {/* Search part  */}
             <div className=" grid grid-cols-8 gap-8 h-20">
@@ -196,12 +191,12 @@ const WeatherDashboard = () => {
             </div>
 
             {/* cities */}
-            <div className=" pt-10 pb-3  mr-10  border-b border-[#9EA7A6] ">
+            <div className=" pt-5 pb-5  mr-10  border-b border-[#9EA7A6] ">
               {predefinedCities.map((predefinedCity) => (
                 <button
                   key={predefinedCity}
                   onClick={() => handlePredefinedCityClick(predefinedCity)}
-                  className=" block text-[#979fa1] pb-7 font-semibold text-md"
+                  className=" block text-[#979fa1]  font-semibold text-md  hover:bg-[#71858317] hover:text-[#E0E3E3] rounded  w-full text-start py-3 my-1 "
                 >
                   {predefinedCity}
                 </button>
